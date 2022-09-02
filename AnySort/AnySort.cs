@@ -49,7 +49,7 @@ namespace AnySort
                 }
             }
 
-            List<T> resList = origList;
+            List<T> resList = new List<T>();
             foreach (int index in sortInfo)
             {
                 resList.Add(origList[index]);
@@ -171,16 +171,15 @@ namespace AnySort
             if (leftIndex < j)
             {
                 //QuickSort(origList, leftIndex, j, sortInfo, sortOption);
-                if (j - leftIndex > 100)
+                if (j - leftIndex > 50)
                 {
                     QuickSort(origList, leftIndex, j, sortInfo, sortOption);
                 }
                 else
                 {
                     List<T> partList = origList.GetRange(leftIndex, j - leftIndex + 1);
-                    List<T> newList = new List<T>();
-                    BinarySort(partList, sortOption, newList);
-                    foreach (T res in newList)
+                    BinarySort(ref partList, sortOption);
+                    foreach (T res in partList)
                     {
                         origList[leftIndex++] = res;
                     }
@@ -189,16 +188,15 @@ namespace AnySort
             if (i < rightIndex)
             {
                 //QuickSort(origList, i, rightIndex, sortInfo, sortOption);
-                if (rightIndex - i > 100)
+                if (rightIndex - i > 50)
                 {
                     QuickSort(origList, i, rightIndex, sortInfo, sortOption);
                 }
                 else
                 {
                     List<T> partList = origList.GetRange(i, rightIndex - i + 1);
-                    List<T> newList = new List<T>();
-                    BinarySort(partList, sortOption, newList);
-                    foreach (T res in newList)
+                    BinarySort(ref partList, sortOption);
+                    foreach (T res in partList)
                     {
                         origList[i++] = res;
                     }

@@ -149,7 +149,7 @@ namespace AnySortTest
             SortOption sortOption = new SortOption();
             sortOption.IsNumber = false;
             sortOption.IsString = false;
-            CheckSame(origList1, origList2, sortOption);
+            CostTest(origList1, origList2, sortOption);
         }
 
         private static List<TimeSpan> GetTimeSpanList(int count)
@@ -192,7 +192,7 @@ namespace AnySortTest
             {
                 List<T> orig = origList1[i];
                 DateTime dateTime1 = DateTime.Now;
-                AnySort.AnySort.BinarySort(ref orig, sortOption);
+                AnySort.AnySort.QuickSort(orig, sortOption);
                 DateTime dateTime2 = DateTime.Now;
                 origList2[i].Sort();
                 DateTime dateTime3 = DateTime.Now;
@@ -211,7 +211,7 @@ namespace AnySortTest
             for (int i = 0; i < origList1.Count; ++i)
             {
                 List<T> orig1 = origList1[i];
-                AnySort.AnySort.BinarySort(ref orig1, sortOption);
+                AnySort.AnySort.QuickSort(orig1, sortOption);
                 List<T> orig2 = origList2[i];
                 orig2.Sort();
 
