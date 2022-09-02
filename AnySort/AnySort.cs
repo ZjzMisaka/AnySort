@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,40 +9,35 @@ namespace AnySort
 {
     static public class AnySort
     {
-        static public List<int> BinarySort<T>(List<T> origList, List<T> newList = null)
-        {
-            List<string> stringList = null;
-            List<int> intList = null;
-            if (typeof(T) == typeof(string))
-            {
-                stringList = origList as List<string>;
-            }
-            else if(typeof(T) == typeof(int))
-            {
-                intList = origList as List<int>;
-            }
 
+        static public List<int> BinarySort<T>(ref List<T> origList, SortOption sortOption)
+        {
             List<int> sortInfo = new List<int>();
             if (origList.Count != 0)
             {
                 sortInfo.Add(0);
-                newList?.Add(origList[0]);
             }
             if (origList.Count > 1)
             {
                 for (int i = 1; i < origList.Count; i++)
                 {
                     int from = 0;
-                    int to = sortInfo.Count - 1;
+                    int to = i - 1;
                     int mid = (from + to) / 2;
                     int index = -1;
-                    if (stringList != null)
+                    if (sortOption.IsString && sortOption.CompareOrdinal)
                     {
-                        index = Half(stringList, i, sortInfo, from, to, mid);
                     }
-                    else if (intList != null)
+                    else if (sortOption.IsNumber)
                     {
-                        index = Half(intList, i, sortInfo, from, to, mid);
+                    }
+                    else if (typeof(T).GetInterface(nameof(IComparable)) != null)
+                    {
+                        index = Half(origList, from, to, mid, origList[i] as IComparable, sortInfo);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("origList must be implemented from IComparable");
                     }
 
                     if (index == -1)
@@ -49,104 +45,165 @@ namespace AnySort
                         continue;
                     }
 
-                    if (newList != null)
-                    {
-                        if (index >= newList.Count)
-                        {
-                            newList.Add(origList[i]);
-                        }
-                        else
-                        {
-                            newList.Insert(index, origList[i]);
-                        }
-                    }
+                    sortInfo.Insert(index, i);
                 }
             }
+
+            List<T> resList = origList;
+            foreach (int index in sortInfo)
+            {
+                resList.Add(origList[index]);
+            }
+            origList = resList;
 
             return sortInfo;
         }
 
-        private static int Half(List<string> origList, int origListIndex, List<int> sortInfo, int from, int to, int mid)
+
+        private static int Half<T>(List<T> origList, int from, int to, int mid, IComparable value, List<int> sortInfo)
         {
-            if (String.CompareOrdinal(origList[sortInfo[mid]], (origList[origListIndex])) < 0)
+            if (value.CompareTo(origList[sortInfo[mid]]) > 0)
             {
                 if (mid == to)
                 {
-                    sortInfo.Add(origListIndex);
-                    return sortInfo.Count;
+                    return to + 1;
                 }
-                if (String.CompareOrdinal(origList[sortInfo[mid + 1]], origList[origListIndex]) > 0)
+                if (value.CompareTo(origList[sortInfo[mid + 1]]) < 0)
                 {
-                    sortInfo.Insert(mid + 1, origListIndex);
                     return mid + 1;
                 }
                 from = mid + 1;
                 mid = (from + to) / 2;
-                return Half(origList, origListIndex, sortInfo, from, to, mid);
+                return Half(origList, from, to, mid, value, sortInfo);
             }
-            else if (String.CompareOrdinal(origList[sortInfo[mid]], (origList[origListIndex])) > 0)
+            else if (value.CompareTo(origList[sortInfo[mid]]) < 0)
             {
                 if (mid == from)
                 {
-                    sortInfo.Insert(from, origListIndex);
                     return from;
                 }
-                if (String.CompareOrdinal(origList[sortInfo[mid - 1]], origList[origListIndex]) < 0)
+                if (value.CompareTo(origList[sortInfo[mid - 1]]) > 0)
                 {
-                    sortInfo.Insert(mid, origListIndex);
                     return mid;
                 }
                 to = mid;
                 mid = (from + to) / 2;
-                return Half(origList, origListIndex, sortInfo, from, to, mid);
+                return Half(origList, from, to, mid, value, sortInfo);
             }
             else
             {
-                sortInfo.Insert(mid, origListIndex);
                 return mid;
             }
         }
 
-        private static int Half(List<int> origList, int origListIndex, List<int> sortInfo, int from, int to, int mid)
+
+        static public List<int> QuickSort<T>(List<T> origList, SortOption sortOption)
         {
-            if (origList[sortInfo[mid]] < (origList[origListIndex]))
-            {
-                if (mid == to)
-                {
-                    sortInfo.Add(origListIndex);
-                    return sortInfo.Count;
-                }
-                if (origList[sortInfo[mid + 1]] > origList[origListIndex])
-                {
-                    sortInfo.Insert(mid + 1, origListIndex);
-                    return mid + 1;
-                }
-                from = mid + 1;
-                mid = (from + to) / 2;
-                return Half(origList, origListIndex, sortInfo, from, to, mid);
-            }
-            else if (origList[sortInfo[mid]] > (origList[origListIndex]))
-            {
-                if (mid == from)
-                {
-                    sortInfo.Insert(from, origListIndex);
-                    return from;
-                }
-                if (origList[sortInfo[mid - 1]] < origList[origListIndex])
-                {
-                    sortInfo.Insert(mid, origListIndex);
-                    return mid;
-                }
-                to = mid;
-                mid = (from + to) / 2;
-                return Half(origList, origListIndex, sortInfo, from, to, mid);
-            }
-            else
-            {
-                sortInfo.Insert(mid, origListIndex);
-                return mid;
-            }
+            int[] sortInfo = new int[origList.Count];
+            QuickSort(origList, 0, origList.Count - 1, sortInfo, sortOption);
+            return sortInfo.ToList();
         }
 
+        // To do 三数取中 多线程
+        static private void QuickSort<T>(List<T> origList, int leftIndex, int rightIndex, int[] sortInfo, SortOption sortOption)
+        {
+            int i = leftIndex;
+            int j = rightIndex;
+            IComparable pivot = origList[leftIndex] as IComparable;
+            List<int> sameList = new List<int>();
+            while (i <= j)
+            {
+                while (pivot.CompareTo(origList[i]) > 0)
+                {
+                    i++;
+                }
+
+                while (pivot.CompareTo(origList[j]) < 0)
+                {
+                    j--;
+                }
+                if (i <= j)
+                {
+                    T temp = origList[i];
+                    origList[i] = origList[j];
+                    origList[j] = temp;
+
+                    sortInfo[i] = j;
+                    sortInfo[j] = i;
+
+                    i++;
+                    j--;
+
+                    if (pivot.Equals(origList[i]))
+                    { 
+                        sameList.Add(i);
+                    }
+                    if (pivot.Equals(origList[i]))
+                    {
+                        sameList.Add(j);
+                    }
+                }
+            }
+            foreach (int index in sameList)
+            {
+                if (index < j)
+                {
+                    --j;
+                    T temp = origList[index];
+                    origList[index] = origList[j];
+                    origList[j] = temp;
+
+                    sortInfo[index] = j;
+                    sortInfo[j] = index;
+                }
+                else if (index > i)
+                {
+                    ++i;
+                    T temp = origList[index];
+                    origList[index] = origList[i];
+                    origList[i] = temp;
+
+                    sortInfo[index] = i;
+                    sortInfo[i] = index;
+                }
+            }
+
+            if (leftIndex < j)
+            {
+                //QuickSort(origList, leftIndex, j, sortInfo, sortOption);
+                if (j - leftIndex > 100)
+                {
+                    QuickSort(origList, leftIndex, j, sortInfo, sortOption);
+                }
+                else
+                {
+                    List<T> partList = origList.GetRange(leftIndex, j - leftIndex + 1);
+                    List<T> newList = new List<T>();
+                    BinarySort(partList, sortOption, newList);
+                    foreach (T res in newList)
+                    {
+                        origList[leftIndex++] = res;
+                    }
+                }
+            }
+            if (i < rightIndex)
+            {
+                //QuickSort(origList, i, rightIndex, sortInfo, sortOption);
+                if (rightIndex - i > 100)
+                {
+                    QuickSort(origList, i, rightIndex, sortInfo, sortOption);
+                }
+                else
+                {
+                    List<T> partList = origList.GetRange(i, rightIndex - i + 1);
+                    List<T> newList = new List<T>();
+                    BinarySort(partList, sortOption, newList);
+                    foreach (T res in newList)
+                    {
+                        origList[i++] = res;
+                    }
+                }
+            }
+        }
     }
 }
