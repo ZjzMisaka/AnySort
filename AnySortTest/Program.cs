@@ -173,7 +173,7 @@ namespace AnySortTest
             Random r = new Random(BitConverter.ToInt32(b, 0));
             for (int i = 0; i < count; ++i)
             {
-                int n = r.Next(-100000000, 100000000);
+                int n = r.Next(-1000, 1000);
                 TimeSpan ts = DateTime.Now - DateTime.FromBinary(n);
                 list.Add(ts);
             }
