@@ -9,10 +9,8 @@ namespace AnySort
 {
     static public class AnySort
     {
-
         static public List<int> BinarySort<T>(ref List<T> origList, SortOption sortOption) where T : IComparable
         {
-            // todo try dic
             List<int> sortInfo = new List<int>(origList.Count);
             if (origList.Count != 0)
             {
@@ -32,14 +30,14 @@ namespace AnySort
                     }
                     else
                     {
-                        index = Half(origList, from, to, mid, origList[i] as IComparable, sortInfo);
+                        index = Half(origList, from, to, mid, origList[i], sortInfo);
                     }
 
                     sortInfo.Insert(index, i);
                 }
             }
 
-            List<T> resList = new List<T>();
+            List<T> resList = new List<T>(origList.Count);
             foreach (int index in sortInfo)
             {
                 resList.Add(origList[index]);
@@ -137,14 +135,15 @@ namespace AnySort
             return sortInfo.ToList();
         }
 
-        // To do 三数取中 多线程
+        // To do 多线程
         static private void SplitCompare<T>(List<T> origList, int leftIndex, int rightIndex, int[] sortInfo, SortOption sortOption) where T : IComparable
         {
             int i = leftIndex;
             int j = rightIndex;
-            IComparable pivot = origList[leftIndex] as IComparable;
+            int m = (leftIndex + rightIndex) / 2;
+            IComparable pivot = origList[m];
             List<int> sameList = new List<int>();
-            while (i <= j)
+            while (i < j)
             {
                 while (pivot.CompareTo(origList[i]) > 0)
                 {
@@ -155,7 +154,8 @@ namespace AnySort
                 {
                     j--;
                 }
-                if (i <= j)
+
+                if (i < j)
                 {
                     T temp = origList[i];
                     origList[i] = origList[j];
@@ -164,42 +164,58 @@ namespace AnySort
                     sortInfo[i] = j;
                     sortInfo[j] = i;
 
-                    i++;
-                    j--;
-
-                    if (pivot.Equals(origList[i]))
-                    { 
-                        sameList.Add(i);
-                    }
                     if (pivot.Equals(origList[i]))
                     {
+                        sameList.Add(i);
+                        j--;
+                    }
+                    if (pivot.Equals(origList[j]))
+                    {
                         sameList.Add(j);
+                        i++;
                     }
                 }
             }
-            foreach (int index in sameList)
+
+            if (i == j)
             {
-                if (index < j)
+                i++;
+                j--;
+            }
+            else
+            {
+                if (pivot.Equals(origList[i]))
                 {
-                    --j;
-                    T temp = origList[index];
-                    origList[index] = origList[j];
-                    origList[j] = temp;
-
-                    sortInfo[index] = j;
-                    sortInfo[j] = index;
+                    i++;
                 }
-                else if (index > i)
+                else if (pivot.Equals(origList[j]))
                 {
-                    ++i;
-                    T temp = origList[index];
-                    origList[index] = origList[i];
-                    origList[i] = temp;
-
-                    sortInfo[index] = i;
-                    sortInfo[i] = index;
+                    j--;
                 }
             }
+            //foreach (int index in sameList)
+            //{
+            //    if (index < j)
+            //    {
+            //        --j;
+            //        T temp = origList[index];
+            //        origList[index] = origList[j];
+            //        origList[j] = temp;
+
+            //        sortInfo[index] = j;
+            //        sortInfo[j] = index;
+            //    }
+            //    else if (index > i)
+            //    {
+            //        ++i;
+            //        T temp = origList[index];
+            //        origList[index] = origList[i];
+            //        origList[i] = temp;
+
+            //        sortInfo[index] = i;
+            //        sortInfo[i] = index;
+            //    }
+            //}
 
             if (leftIndex < j)
             {
@@ -263,17 +279,17 @@ namespace AnySort
                     sortInfo[i] = j;
                     sortInfo[j] = i;
 
-                    i++;
-                    j--;
-
                     if (pivot.Equals(origList[i]))
                     {
                         sameList.Add(i);
                     }
-                    if (pivot.Equals(origList[i]))
+                    if (pivot.Equals(origList[j]))
                     {
                         sameList.Add(j);
                     }
+
+                    i++;
+                    j--;
                 }
             }
             foreach (int index in sameList)

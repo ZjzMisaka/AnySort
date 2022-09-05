@@ -13,46 +13,46 @@ namespace AnySortTest
     {
         static void Main(string[] args)
         {
-            List<string> list = new List<string>();
-            List<string> list1 = new List<string>();
-            List<string> newList1 = new List<string>();
-            List<string> newList2 = new List<string>();
-            list.Add("b");
-            list.Add("a");
-            list.Add("z");
-            list.Add("c");
-            list.Add("d");
-            list.Add("d");
-            list.Add("e");
-            list.Add("d");
-            list1.Add("b");
-            list1.Add("a");
-            list1.Add("z");
-            list1.Add("c");
-            list1.Add("d");
-            list1.Add("d");
-            list1.Add("e");
-            list1.Add("d");
-            SortOption sortOption = new SortOption();
-            sortOption.CompareStringOrdinal = true;
-            List<int> sortInfo = AnySort.AnySort.QuickSort(list, sortOption);
+            //List<string> list = new List<string>();
+            //List<string> list1 = new List<string>();
+            //List<string> newList1 = new List<string>();
+            //List<string> newList2 = new List<string>();
+            //list.Add("b");
+            //list.Add("a");
+            //list.Add("z");
+            //list.Add("c");
+            //list.Add("d");
+            //list.Add("d");
+            //list.Add("e");
+            //list.Add("d");
+            //list1.Add("b");
+            //list1.Add("a");
+            //list1.Add("z");
+            //list1.Add("c");
+            //list1.Add("d");
+            //list1.Add("d");
+            //list1.Add("e");
+            //list1.Add("d");
+            //SortOption sortOption = new SortOption();
+            //sortOption.CompareStringOrdinal = true;
+            //List<int> sortInfo = AnySort.AnySort.QuickSort(list, sortOption);
 
-            foreach (int index in sortInfo)
-            {
-                newList1.Add(list1[index]);
-            }
+            //foreach (int index in sortInfo)
+            //{
+            //    newList1.Add(list1[index]);
+            //}
 
-            Console.WriteLine("---");
-            foreach (string str in newList1)
-            {
-                Console.WriteLine(str);
-            }
-            Console.WriteLine("---");
-            foreach (string str in list)
-            {
-                Console.WriteLine(str);
-            }
-            Console.ReadLine();
+            //Console.WriteLine("---");
+            //foreach (string str in newList1)
+            //{
+            //    Console.WriteLine(str);
+            //}
+            //Console.WriteLine("---");
+            //foreach (string str in list)
+            //{
+            //    Console.WriteLine(str);
+            //}
+            //Console.ReadLine();
 
 
 
@@ -144,25 +144,25 @@ namespace AnySortTest
             //    Console.WriteLine(list1[i] + "    :    " + resList[i]);
             //}
 
-            //List<List<TimeSpan>> origList1 = new List<List<TimeSpan>>();
-            //List<List<TimeSpan>> origList2 = new List<List<TimeSpan>>();
-            //List<List<string>> origList3 = new List<List<string>>();
-            //List<List<string>> origList4 = new List<List<string>>();
-            //for (int i = 0; i < 20; ++i)
-            //{
-            //    //List<TimeSpan> tsList = GetTimeSpanList(10000);
-            //    List<string> strList = GetRandomString(20);
-            //    origList3.Add(strList);
-            //    List<string> newStrList = new List<string>();
-            //    foreach (string ts in strList)
-            //    {
-            //        newStrList.Add(ts);
-            //    }
-            //    origList4.Add(newStrList);
-            //}
-            //SortOption sortOption = new SortOption();
-            //sortOption.CompareStringOrdinal = true;
-            //CheckSame(origList3, origList4, sortOption);
+            List<List<TimeSpan>> origList1 = new List<List<TimeSpan>>();
+            List<List<TimeSpan>> origList2 = new List<List<TimeSpan>>();
+            List<List<string>> origList3 = new List<List<string>>();
+            List<List<string>> origList4 = new List<List<string>>();
+            for (int i = 0; i < 1000; ++i)
+            {
+                List<TimeSpan> tsList = GetTimeSpanList(10000);
+                //List<string> strList = GetRandomString(20);
+                origList1.Add(tsList);
+                List<TimeSpan> newTsList = new List<TimeSpan>();
+                foreach (TimeSpan ts in tsList)
+                {
+                    newTsList.Add(ts);
+                }
+                origList2.Add(newTsList);
+            }
+            SortOption sortOption = new SortOption();
+            sortOption.CompareStringOrdinal = false;
+            CheckSame(origList1, origList2, sortOption);
         }
 
         private static List<TimeSpan> GetTimeSpanList(int count)
