@@ -8,12 +8,8 @@ namespace AnySort
 {
     public class SortOption
     {
-        private bool isString = false;
-        private bool isNumber = false;
-        private bool compareOrdinal = true;
+        private bool compareStringOrdinal = false;
 
-        public bool IsString { get => isString; set => isString = value; }
-        public bool IsNumber { get => isNumber; set => isNumber = value; }
-        public bool CompareOrdinal { get => compareOrdinal; set => compareOrdinal = value; }
+        public bool CompareStringOrdinal { get => compareStringOrdinal; set => compareStringOrdinal = value; }
     }
 }
