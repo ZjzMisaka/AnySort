@@ -148,9 +148,9 @@ namespace AnySortTest
             List<List<TimeSpan>> origList2 = new List<List<TimeSpan>>();
             List<List<string>> origList3 = new List<List<string>>();
             List<List<string>> origList4 = new List<List<string>>();
-            for (int i = 0; i < 1000; ++i)
+            for (int i = 0; i < 10000; ++i)
             {
-                List<TimeSpan> tsList = GetTimeSpanList(10000);
+                List<TimeSpan> tsList = GetTimeSpanList(15000);
                 //List<string> strList = GetRandomString(20);
                 origList1.Add(tsList);
                 List<TimeSpan> newTsList = new List<TimeSpan>();
@@ -162,7 +162,7 @@ namespace AnySortTest
             }
             SortOption sortOption = new SortOption();
             sortOption.CompareStringOrdinal = false;
-            CheckSame(origList1, origList2, sortOption);
+            CostTest(origList1, origList2, sortOption);
         }
 
         private static List<TimeSpan> GetTimeSpanList(int count)

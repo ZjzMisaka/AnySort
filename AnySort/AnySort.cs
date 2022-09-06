@@ -142,6 +142,7 @@ namespace AnySort
             int j = rightIndex;
             int m = (leftIndex + rightIndex) / 2;
             IComparable pivot = origList[m];
+            // 使用list存放相同元素比五路并三路排序性能略优
             List<int> sameList = new List<int>();
             while (i < j)
             {
@@ -171,9 +172,6 @@ namespace AnySort
 
                     sortInfo[i] = j;
                     sortInfo[j] = i;
-
-                    
-                    
                 }
             }
 
@@ -268,20 +266,31 @@ namespace AnySort
         {
             int i = leftIndex;
             int j = rightIndex;
+            int m = (leftIndex + rightIndex) / 2;
             string pivot = origList[leftIndex].ToString();
+            // 使用list存放相同元素比五路并三路排序性能略优
             List<int> sameList = new List<int>();
-            while (i <= j)
+            while (i < j)
             {
-                while (String.CompareOrdinal(pivot, origList[i].ToString()) > 0)
+                while (i < j && String.CompareOrdinal(pivot, origList[i].ToString()) >= 0)
                 {
+                    if (pivot.Equals(origList[i]))
+                    {
+                        sameList.Add(i);
+                    }
                     i++;
                 }
 
-                while (String.CompareOrdinal(pivot, origList[j].ToString()) < 0)
+                while (i < j && String.CompareOrdinal(pivot, origList[j].ToString()) <= 0)
                 {
+                    if (pivot.Equals(origList[j]))
+                    {
+                        sameList.Add(j);
+                    }
                     j--;
                 }
-                if (i <= j)
+
+                if (i < j)
                 {
                     T temp = origList[i];
                     origList[i] = origList[j];
@@ -289,25 +298,29 @@ namespace AnySort
 
                     sortInfo[i] = j;
                     sortInfo[j] = i;
-
-                    if (pivot.Equals(origList[i]))
-                    {
-                        sameList.Add(i);
-                    }
-                    if (pivot.Equals(origList[j]))
-                    {
-                        sameList.Add(j);
-                    }
-
-                    i++;
-                    j--;
                 }
             }
+
+            if (i == j)
+            {
+                if (String.CompareOrdinal(pivot, origList[j].ToString()) <= 0)
+                {
+                    j--;
+                }
+                else if (String.CompareOrdinal(pivot, origList[i].ToString()) >= 0)
+                {
+                    i++;
+                }
+            }
+
             foreach (int index in sameList)
             {
                 if (index < j)
                 {
-                    --j;
+                    if (pivot.Equals(origList[j]))
+                    {
+                        --j;
+                    }
                     T temp = origList[index];
                     origList[index] = origList[j];
                     origList[j] = temp;
@@ -317,7 +330,10 @@ namespace AnySort
                 }
                 else if (index > i)
                 {
-                    ++i;
+                    if (pivot.Equals(origList[i]))
+                    {
+                        ++i;
+                    }
                     T temp = origList[index];
                     origList[index] = origList[i];
                     origList[i] = temp;
@@ -327,12 +343,21 @@ namespace AnySort
                 }
             }
 
+            if (i < origList.Count && pivot.Equals(origList[i]))
+            {
+                i++;
+            }
+            if (j >= 0 && pivot.Equals(origList[j]))
+            {
+                j--;
+            }
+
             if (leftIndex < j)
             {
                 SplitCompareOrdinal(origList, leftIndex, j, sortInfo, sortOption);
                 //if (j - leftIndex > 50)
                 //{
-                //    SplitCompareOrdinal(origList, leftIndex, j, sortInfo, sortOption);
+                //    SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
                 //}
                 //else
                 //{
@@ -349,7 +374,7 @@ namespace AnySort
                 SplitCompareOrdinal(origList, i, rightIndex, sortInfo, sortOption);
                 //if (rightIndex - i > 50)
                 //{
-                //    SplitCompareOrdinal(origList, i, rightIndex, sortInfo, sortOption);
+                //    SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
                 //}
                 //else
                 //{
