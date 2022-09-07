@@ -148,9 +148,9 @@ namespace AnySortTest
             List<List<TimeSpan>> origList2 = new List<List<TimeSpan>>();
             List<List<string>> origList3 = new List<List<string>>();
             List<List<string>> origList4 = new List<List<string>>();
-            for (int i = 0; i < 10000; ++i)
+            for (int i = 0; i < 5000; ++i)
             {
-                List<TimeSpan> tsList = GetTimeSpanList(15000);
+                List<TimeSpan> tsList = GetTimeSpanList(10000);
                 //List<string> strList = GetRandomString(20);
                 origList1.Add(tsList);
                 List<TimeSpan> newTsList = new List<TimeSpan>();
@@ -210,7 +210,7 @@ namespace AnySortTest
             {
                 List<T> orig = origList1[i];
                 DateTime dateTime1 = DateTime.Now;
-                AnySort.AnySort.QuickSort(orig, sortOption);
+                AnySort.AnySort.BinarySort(orig, sortOption);
                 DateTime dateTime2 = DateTime.Now;
                 origList2[i].Sort();
                 DateTime dateTime3 = DateTime.Now;
@@ -229,7 +229,7 @@ namespace AnySortTest
             for (int i = 0; i < origList1.Count; ++i)
             {
                 List<T> orig1 = origList1[i];
-                AnySort.AnySort.QuickSort(orig1, sortOption);
+                AnySort.AnySort.BinarySort(orig1, sortOption);
                 List<T> orig2 = origList2[i];
                 orig2.Sort();
 

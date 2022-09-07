@@ -9,7 +9,7 @@ namespace AnySort
 {
     static public class AnySort
     {
-        static public List<int> BinarySort<T>(ref List<T> origList, SortOption sortOption) where T : IComparable
+        static public List<int> BinarySort<T>(List<T> origList, SortOption sortOption) where T : IComparable
         {
             List<int> sortInfo = new List<int>(origList.Count);
             if (origList.Count != 0)
@@ -37,16 +37,14 @@ namespace AnySort
                 }
             }
 
-            List<T> resList = new List<T>(origList.Count);
-            foreach (int index in sortInfo)
+            List<T> newList = new List<T>(origList);
+            for (int index = 0; index < sortInfo.Count; ++index)
             {
-                resList.Add(origList[index]);
+                origList[index] = newList[sortInfo[index]];
             }
-            origList = resList;
 
             return sortInfo;
         }
-
 
         private static int Half<T>(List<T> origList, int from, int to, int mid, IComparable value, List<int> sortInfo) where T : IComparable
         {
