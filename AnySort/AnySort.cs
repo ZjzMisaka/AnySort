@@ -9,19 +9,32 @@ namespace AnySort
 {
     static public class AnySort
     {
-        static public List<int> BinarySort<T>(List<T> origList, SortOption sortOption) where T : IComparable
+        static public List<int> BinarySort<T>(List<T> origList, SortOption sortOption = null) where T : IComparable
         {
-            List<int> sortInfo = new List<int>(origList.Count);
-            if (origList.Count != 0)
+            if (sortOption == null)
             {
-                sortInfo.Add(0);
+                sortOption = new SortOption();
             }
-            if (origList.Count > 1)
+            if (sortOption.RangeFrom == -1)
             {
-                for (int i = 1; i < origList.Count; i++)
+                sortOption.RangeFrom = 0;
+            }
+            if (sortOption.RangeTo == -1)
+            {
+                sortOption.RangeTo = origList.Count - 1;
+            }
+            int rangeLength = sortOption.RangeTo - sortOption.RangeFrom + 1;
+            List<int> sortInfo = new List<int>(rangeLength);
+            if (rangeLength != 0)
+            {
+                sortInfo.Add(sortOption.RangeFrom);
+            }
+            if (rangeLength > 1)
+            {
+                for (int i = sortOption.RangeFrom + 1; i <= sortOption.RangeTo; i++)
                 {
                     int from = 0;
-                    int to = i - 1;
+                    int to = i - 1 - sortOption.RangeFrom;
                     int mid = (from + to) / 2;
                     int index;
                     if (sortOption.CompareStringOrdinal)
@@ -40,11 +53,13 @@ namespace AnySort
             List<T> newList = new List<T>(origList);
             for (int index = 0; index < sortInfo.Count; ++index)
             {
-                origList[index] = newList[sortInfo[index]];
+                origList[sortOption.RangeFrom + index] = newList[sortInfo[index]];
             }
 
             return sortInfo;
         }
+
+
 
         private static int Half<T>(List<T> origList, int from, int to, int mid, IComparable value, List<int> sortInfo) where T : IComparable
         {
@@ -119,8 +134,12 @@ namespace AnySort
         }
 
 
-        static public List<int> QuickSort<T>(List<T> origList, SortOption sortOption) where T : IComparable
+        static public List<int> QuickSort<T>(List<T> origList, SortOption sortOption = null) where T : IComparable
         {
+            if (sortOption == null)
+            {
+                sortOption = new SortOption();
+            }
             int[] sortInfo = new int[origList.Count];
             if (sortOption.CompareStringOrdinal)
             {
@@ -133,9 +152,10 @@ namespace AnySort
             return sortInfo.ToList();
         }
 
-        // To do 多线程
+        // To do 多线程 Range
         static private void SplitCompare<T>(List<T> origList, int leftIndex, int rightIndex, int[] sortInfo, SortOption sortOption) where T : IComparable
         {
+            SortOption sortOptionBs = new SortOption(sortOption);
             int i = leftIndex;
             int j = rightIndex;
             int m = (leftIndex + rightIndex) / 2;
@@ -226,36 +246,56 @@ namespace AnySort
 
             if (leftIndex < j)
             {
-                SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
+                //SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
+                if (j - leftIndex > 50)
+                {
+                    SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
+                }
+                else
+                {
+                    List<T> partList = origList.GetRange(leftIndex, j - leftIndex + 1);
+                    BinarySort(partList, new SortOption());
+                    foreach (T res in partList)
+                    {
+                        origList[leftIndex++] = res;
+                    }
+                }
                 //if (j - leftIndex > 50)
                 //{
                 //    SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
                 //}
                 //else
                 //{
-                //    List<T> partList = origList.GetRange(leftIndex, j - leftIndex + 1);
-                //    BinarySort(ref partList, sortOption);
-                //    foreach (T res in partList)
-                //    {
-                //        origList[leftIndex++] = res;
-                //    }
+                //    sortOptionBs.RangeFrom = leftIndex;
+                //    sortOptionBs.RangeTo = j;
+                //    BinarySort(origList, sortOptionBs);
                 //}
             }
             if (i < rightIndex)
             {
-                SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
+                //SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
+                if (rightIndex - i > 50)
+                {
+                    SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
+                }
+                else
+                {
+                    List<T> partList = origList.GetRange(i, rightIndex - i + 1);
+                    BinarySort(partList, new SortOption());
+                    foreach (T res in partList)
+                    {
+                        origList[i++] = res;
+                    }
+                }
                 //if (rightIndex - i > 50)
                 //{
                 //    SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
                 //}
                 //else
                 //{
-                //    List<T> partList = origList.GetRange(i, rightIndex - i + 1);
-                //    BinarySort(ref partList, sortOption);
-                //    foreach (T res in partList)
-                //    {
-                //        origList[i++] = res;
-                //    }
+                //    sortOptionBs.RangeFrom = i;
+                //    sortOptionBs.RangeTo = rightIndex;
+                //    BinarySort(origList, sortOptionBs);
                 //}
             }
         }
@@ -355,16 +395,14 @@ namespace AnySort
                 SplitCompareOrdinal(origList, leftIndex, j, sortInfo, sortOption);
                 //if (j - leftIndex > 50)
                 //{
-                //    SplitCompare(origList, leftIndex, j, sortInfo, sortOption);
+                //    SplitCompareOrdinal(origList, leftIndex, j, sortInfo, sortOption);
                 //}
                 //else
                 //{
-                //    List<T> partList = origList.GetRange(leftIndex, j - leftIndex + 1);
-                //    BinarySort(ref partList, sortOption);
-                //    foreach (T res in partList)
-                //    {
-                //        origList[leftIndex++] = res;
-                //    }
+                //    SortOption sortOptionBs = new SortOption(sortOption);
+                //    sortOptionBs.RangeFrom = leftIndex;
+                //    sortOptionBs.RangeTo = j;
+                //    BinarySort(origList, sortOptionBs);
                 //}
             }
             if (i < rightIndex)
@@ -372,16 +410,14 @@ namespace AnySort
                 SplitCompareOrdinal(origList, i, rightIndex, sortInfo, sortOption);
                 //if (rightIndex - i > 50)
                 //{
-                //    SplitCompare(origList, i, rightIndex, sortInfo, sortOption);
+                //    SplitCompareOrdinal(origList, i, rightIndex, sortInfo, sortOption);
                 //}
                 //else
                 //{
-                //    List<T> partList = origList.GetRange(i, rightIndex - i + 1);
-                //    BinarySort(ref partList, sortOption);
-                //    foreach (T res in partList)
-                //    {
-                //        origList[i++] = res;
-                //    }
+                //    SortOption sortOptionBs = new SortOption(sortOption);
+                //    sortOptionBs.RangeFrom = i;
+                //    sortOptionBs.RangeTo = rightIndex;
+                //    BinarySort(origList, sortOptionBs);
                 //}
             }
         }
